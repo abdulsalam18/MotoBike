@@ -1,0 +1,8 @@
+{
+  "name": "cordova-plugin-apk-updater",
+  "version": "1.0.0",
+  "cordova": {
+    "id": "cordova-plugin-apk-updater",
+    "platforms": ["android"]
+  }
+}

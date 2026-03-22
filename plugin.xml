@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-apk-updater"
+        version="1.0.0">
+
+     <name>ApkUpdater</name>
+
+     <platform name="android">
+
+          <!-- Permission -->
+          <config-file target="AndroidManifest.xml" parent="/manifest">
+               <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+          </config-file>    
+
+          <!-- Java files -->
+          <source-file src="src/android/UpdateManager.java"
+               target-dir="src/com/apk/update"/>
+                 
+          <source-file src="src/android/ApkUpdater.java"
+               target-dir="src/com/apk/update"/>
+        
+     </platform>
+        
+</plugin>
