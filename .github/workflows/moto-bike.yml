@@ -19,7 +19,7 @@ jobs:
 
       - name: Decode keystore from secret
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/snake-block.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/moto-bike.jks
       - name: Set Gradle permissions
         run: chmod +x ./gradlew
 
