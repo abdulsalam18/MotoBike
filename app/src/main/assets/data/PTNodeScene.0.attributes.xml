@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"/>
+
+<plist version="1.0">
+    <dict>
+        <key>ROOT</key>
+        <array>
+            <dict>
+                <key>id</key>
+                <string>1393</string>
+                <key>className</key>
+                <string>PTNodeScene</string>
+                <key>Name</key>
+                <dict>
+                    <key>value</key>
+                    <string>World 1</string>
+                </dict>
+                <key>Position</key>
+                <dict>
+                    <key>value</key>
+                    <string>{108.000,-100.000}</string>
+                </dict>
+            </dict>
+            <dict>
+                <key>id</key>
+                <string>1871</string>
+                <key>className</key>
+                <string>PTNodeScene</string>
+                <key>Name</key>
+                <dict>
+                    <key>value</key>
+                    <string>World 2</string>
+                </dict>
+                <key>Position</key>
+                <dict>
+                    <key>value</key>
+                    <string>{105.000,37.000}</string>
+                </dict>
+            </dict>
+            <dict>
+                <key>id</key>
+                <string>4457</string>
+                <key>className</key>
+                <string>PTNodeScene</string>
+                <key>Name</key>
+                <dict>
+                    <key>value</key>
+                    <string>World 3</string>
+                </dict>
+                <key>Position</key>
+                <dict>
+                    <key>value</key>
+                    <string>{107.000,151.000}</string>
+                </dict>
+            </dict>
+            <dict>
+                <key>id</key>
+                <string>6617</string>
+                <key>className</key>
+                <string>PTNodeScene</string>
+                <key>Name</key>
+                <dict>
+                    <key>value</key>
+                    <string>World 4</string>
+                </dict>
+                <key>Position</key>
+                <dict>
+                    <key>value</key>
+                    <string>{109.000,274.000}</string>
+                </dict>
+            </dict>
+        </array>
+    </dict>
+</plist>

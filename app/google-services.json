@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "781247780031",
+    "project_id": "moto-bike-5858b",
+    "storage_bucket": "moto-bike-5858b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781247780031:android:805350ecfbc1716737220a",
+        "android_client_info": {
+          "package_name": "com.abdulsalam.motobike"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdTONqkwqlEgHL9dMRCewMUsbwtLMrebs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
