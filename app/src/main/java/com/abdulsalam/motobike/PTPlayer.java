@@ -27,7 +27,7 @@ import com.secrethq.utils.PTServicesBridge;
 import org.cocos2dx.lib.Cocos2dxActivity;
 import org.cocos2dx.lib.Cocos2dxGLSurfaceView;
 
-import com.abdulsalam.motobike.R;
+import com.abdulsalam.R;
 
 public class PTPlayer extends Cocos2dxActivity {
     private FirebaseAnalytics firebaseAnalytics;
