@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
-
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.android.MemoryManager;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.secrethq.ads.PTStartAppBridge;
