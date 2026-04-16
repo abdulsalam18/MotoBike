@@ -22,7 +22,7 @@ public class PTStartAppBridge {
     private static Cocos2dxActivity activity;
     private static WeakReference<Cocos2dxActivity> s_activity;
 
-    private static Banner addView;
+    private static Banner banner;
     private static StartAppAd interstitial;
 
     private static boolean isBannerScheduledForShow = false;
