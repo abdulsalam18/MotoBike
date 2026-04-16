@@ -317,6 +317,4 @@ public class PTServicesBridge
         }
         return buf.toString();
     }
-
-
 }
