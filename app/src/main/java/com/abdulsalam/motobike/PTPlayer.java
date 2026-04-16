@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.android.MemoryManager;
 import com.google.android.gms.games.GamesActivityResultCodes;
-import com.secrethq.ads.PTAdAdMobBridge;
+import com.secrethq.ads.PTStartAppBridge;
 import com.secrethq.ads.PTAdAppLovinBridge;
 import com.secrethq.ads.PTAdChartboostBridge;
 import com.secrethq.ads.PTAdFacebookBridge;
