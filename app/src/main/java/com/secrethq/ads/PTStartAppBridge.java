@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import com.abdulsalam.motobike.R;
+import com.abdulsalam.R;
 
 import com.startapp.sdk.ads.banner.Banner;
 import com.startapp.sdk.adsbase.StartAppAd;
