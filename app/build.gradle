@@ -51,4 +51,5 @@ dependencies {
     implementation 'com.startapp:inapp-sdk:5.1.0'
     implementation 'com.google.firebase:firebase-analytics:23.0.0'
     implementation 'com.google.android.gms:play-services-games:23.0.0'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
 }
