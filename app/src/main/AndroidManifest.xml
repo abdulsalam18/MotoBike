@@ -21,6 +21,7 @@
         </provider>
 
         <activity android:name="com.abdulsalam.motobike.PTPlayer"
+            android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
