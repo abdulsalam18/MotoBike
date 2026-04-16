@@ -108,7 +108,7 @@ public class PTPlayer extends Cocos2dxActivity {
 		}
 
 		if (PTJniHelper.isAdNetworkActive("kAdMob") || PTJniHelper.isAdNetworkActive("kFacebook")) {
-			PTAdAdMobBridge.initBridge(this);
+			PTStartAppBridge.initBridge(this);
 		}
 
 		if (PTJniHelper.isAdNetworkActive("kAppLovin")) {
