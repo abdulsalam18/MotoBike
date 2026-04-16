@@ -1,37 +1,25 @@
 package com.secrethq.utils;
 
 import android.app.AlertDialog;
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Log;
-import android.app.UiModeManager;
 
 import com.android.MemoryManager;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.games.Games;
+import com.google.android.gms.games.PlayGames;
+import com.google.android.gms.games.PlayGamesSdk;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
-import java.util.regex.Pattern;
 
-public class PTServicesBridge
-        implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class PTServicesBridge {
 
-    private static PTServicesBridge sInstance;
     private static final String TAG = "PTServicesBridge";
 
     private static native String getLeaderboardId();
@@ -40,48 +28,22 @@ public class PTServicesBridge
     private static Cocos2dxActivity activity;
     private static WeakReference<Cocos2dxActivity> s_activity;
 
-    private static GoogleApiClient mGoogleApiClient;
-
     private static String urlString;
-    private static int scoreValue;
 
-    public static final int RC_SIGN_IN = 9001;
-    private static final int REQUEST_LEADERBOARD = 5000;
+    public static final int REQUEST_LEADERBOARD = 5000;
 
-    // NEW: Google Sign-In client
-    private static GoogleSignInClient googleSignInClient;
+    // ---------------- INIT ----------------
+    public static void initBridge(Cocos2dxActivity act, String appId) {
+        Log.v(TAG, "INIT");
 
-    public static PTServicesBridge instance() {
-        if (sInstance == null)
-            sInstance = new PTServicesBridge();
-        return sInstance;
+        activity = act;
+        s_activity = new WeakReference<>(act);
+
+        // NEW Play Games init
+        PlayGamesSdk.initialize(activity);
     }
 
-    public static void initBridge(Cocos2dxActivity activity, String appId) {
-        Log.v(TAG, "PTServicesBridge INIT");
-
-        PTServicesBridge.s_activity = new WeakReference<>(activity);
-        PTServicesBridge.activity = activity;
-
-        if (appId == null || appId.length() == 0) {
-            return;
-        }
-
-        // Google Play Games API
-        PTServicesBridge.mGoogleApiClient = new GoogleApiClient.Builder(activity)
-                .addApi(Games.API)
-                .addScope(Games.SCOPE_GAMES)
-                .addConnectionCallbacks(instance())
-                .addOnConnectionFailedListener(instance())
-                .build();
-
-        // NEW Google Sign-In (replacement for Plus API)
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-                .build();
-
-        googleSignInClient = GoogleSignIn.getClient(activity, gso);
-    }
-
+    // ---------------- SHARE ----------------
     public static void openShareWidget(String message) {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
@@ -89,6 +51,7 @@ public class PTServicesBridge
         activity.startActivity(Intent.createChooser(sharingIntent, "Share"));
     }
 
+    // ---------------- URL ----------------
     public static void openUrl(String url) {
         urlString = url;
 
@@ -102,44 +65,46 @@ public class PTServicesBridge
         });
     }
 
+    // ---------------- LEADERBOARD ----------------
     public static void showLeaderboard() {
-        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
-            Log.e(TAG, "Google Play Services not connected");
-            return;
-        }
-
         s_activity.get().runOnUiThread(() -> {
+
             String leaderboardId = getLeaderboardId();
             if (leaderboardId == null || leaderboardId.isEmpty()) return;
 
-            activity.startActivityForResult(
-                    Games.Leaderboards.getLeaderboardIntent(mGoogleApiClient, leaderboardId),
-                    REQUEST_LEADERBOARD
-            );
+            PlayGames.getLeaderboardsClient(activity)
+                    .getLeaderboardIntent(leaderboardId)
+                    .addOnSuccessListener(intent ->
+                            activity.startActivityForResult(intent, REQUEST_LEADERBOARD))
+                    .addOnFailureListener(e ->
+                            Log.e(TAG, "Leaderboard Error", e));
         });
     }
 
-    public static void submitScrore(int score) {
-        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) return;
+    // ---------------- SUBMIT SCORE ----------------
+    public static void submitScore(int score) {
 
         String leaderboardId = getLeaderboardId();
         if (leaderboardId == null || leaderboardId.isEmpty()) return;
 
-        Games.Leaderboards.submitScore(mGoogleApiClient, leaderboardId, score);
+        PlayGames.getLeaderboardsClient(activity)
+                .submitScore(leaderboardId, score);
     }
 
+    // ---------------- LOGIN ----------------
     public static void loginGameServices() {
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
+        // Play Games v2 auto sign-in handled internally
+        Log.d(TAG, "Play Games Sign-In handled automatically");
     }
 
-    public static boolean isGameServiceAvialable() {
-        return (mGoogleApiClient != null && mGoogleApiClient.isConnected());
+    public static boolean isGameServiceAvailable() {
+        return true; // v2 handles internally
     }
 
+    // ---------------- WARNING ----------------
     public static void showWarningMessage(String message) {
         s_activity.get().runOnUiThread(() -> {
+
             AlertDialog.Builder dlg = new AlertDialog.Builder(activity);
 
             dlg.setMessage(message);
@@ -159,6 +124,7 @@ public class PTServicesBridge
         });
     }
 
+    // ---------------- DEVICE CHECK ----------------
     public static boolean isRunningOnTV() {
         UiModeManager uiModeManager =
                 (UiModeManager) activity.getSystemService(Context.UI_MODE_SERVICE);
@@ -167,6 +133,7 @@ public class PTServicesBridge
                 == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 
+    // ---------------- SHA1 ----------------
     public static String sha1(byte[] data, int length) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         md.update(data, 0, length);
@@ -177,34 +144,5 @@ public class PTServicesBridge
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.v(TAG, "Google API Connected");
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.v(TAG, "Connection Suspended");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.v(TAG, "Connection Failed: " + connectionResult);
-
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(activity, RC_SIGN_IN);
-            } catch (SendIntentException e) {
-                mGoogleApiClient.connect();
-            }
-        }
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_SIGN_IN && resultCode == -1) {
-            mGoogleApiClient.connect();
-        }
     }
 }
