@@ -54,26 +54,6 @@ public class PTPlayer extends Cocos2dxActivity {
         trackUsers();
 
         UpdateManager.check(this);
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            try {
-               String stackTrace = Log.getStackTraceString(throwable);
-
-               java.io.File file = new java.io.File(getExternalFilesDir(null), "crash_log.txt");
-               java.io.FileWriter writer = new java.io.FileWriter(file, true);
-
-               writer.write("==== CRASH ====\n");
-               writer.write(stackTrace);
-               writer.write("\n\n");
-
-               writer.close();
-           } catch (Exception e) {
-               e.printStackTrace();
-        }
-
-        // app close
-        android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(1);
-        });
     }
 
     private void trackUsers() {
