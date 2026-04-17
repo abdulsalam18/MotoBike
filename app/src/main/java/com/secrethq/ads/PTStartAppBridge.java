@@ -5,10 +5,9 @@ import java.lang.ref.WeakReference;
 import org.cocos2dx.lib.Cocos2dxActivity;
 
 import android.util.Log;
-import android.view.View;
+import android.view.Gravity;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
-import com.abdulsalam.R;
 
 import com.startapp.sdk.ads.banner.Banner;
 import com.startapp.sdk.adsbase.StartAppAd;
@@ -25,34 +24,36 @@ public class PTStartAppBridge {
     private static Banner banner;
     private static StartAppAd interstitial;
 
-    private static boolean isBannerScheduledForShow = false;
-    private static boolean isInterstitialScheduledForShow = false;
+    private static boolean isInterstitialReady = false;
 
-    private static String appId() {
-        return activity.getString(R.string.app_id);
-    }
-    private static native void interstitialDidFail();
-    private static native void bannerDidFail();
-
+    // =========================
     // INIT
+    // =========================
     public static void initBridge(Cocos2dxActivity act){
 
         Log.v(TAG, "INIT");
 
-        s_activity = new WeakReference<>(act);
         activity = act;
+        s_activity = new WeakReference<>(act);
 
-        StartAppSDK.init(activity, appId(), false);
+        // 🔥 Init SDK
+        StartAppSDK.init(activity, activity.getString(
+                activity.getResources().getIdentifier("app_id","string",activity.getPackageName())
+        ), false);
+
+        // 🔥 Enable test ads (remove later)
+        StartAppSDK.setTestAdsEnabled(true);
+
+        // Disable splash
         StartAppAd.disableSplash();
 
         initBanner();
         initInterstitial();
     }
 
-    // -------------------------
+    // =========================
     // BANNER
-    // -------------------------
-
+    // =========================
     public static void initBanner(){
 
         Log.v(TAG, "initBanner");
@@ -61,48 +62,31 @@ public class PTStartAppBridge {
 
             if (banner != null) return;
 
-            FrameLayout frameLayout = (FrameLayout) activity.findViewById(android.R.id.content);
-
-            RelativeLayout layout = new RelativeLayout(activity);
-            frameLayout.addView(layout);
-
-            RelativeLayout.LayoutParams params =
-                    new RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                    );
-
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            FrameLayout root = (FrameLayout) activity.findViewById(android.R.id.content);
 
             banner = new Banner(activity);
 
-            layout.addView(banner, params);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
 
-            banner.setVisibility(View.INVISIBLE);
+            params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+
+            root.addView(banner, params);
+
+            banner.loadAd(); // 🔥 IMPORTANT
+
+            banner.setVisibility(android.view.View.GONE);
         });
-    }
-
-    public static boolean isBannerVisible(){
-
-        if (banner == null) return false;
-
-        return banner.getVisibility() == View.VISIBLE;
     }
 
     public static void showBannerAd(){
 
         Log.v(TAG, "showBannerAd");
 
-        isBannerScheduledForShow = true;
-
         if (banner != null){
-
-            s_activity.get().runOnUiThread(() -> {
-
-                banner.setVisibility(View.VISIBLE);
-
-            });
+            s_activity.get().runOnUiThread(() -> banner.setVisibility(android.view.View.VISIBLE));
         }
     }
 
@@ -110,34 +94,21 @@ public class PTStartAppBridge {
 
         Log.v(TAG, "hideBannerAd");
 
-        isBannerScheduledForShow = false;
-
         if (banner != null){
-
-            s_activity.get().runOnUiThread(() -> {
-
-                banner.setVisibility(View.INVISIBLE);
-
-            });
+            s_activity.get().runOnUiThread(() -> banner.setVisibility(android.view.View.GONE));
         }
     }
 
-    // -------------------------
+    // =========================
     // INTERSTITIAL
-    // -------------------------
-
+    // =========================
     public static void initInterstitial(){
 
         Log.v(TAG, "initInterstitial");
 
-        s_activity.get().runOnUiThread(() -> {
+        interstitial = new StartAppAd(activity);
 
-            if (interstitial != null) return;
-
-            interstitial = new StartAppAd(activity);
-
-            loadInterstitial();
-        });
+        loadInterstitial();
     }
 
     private static void loadInterstitial(){
@@ -146,22 +117,14 @@ public class PTStartAppBridge {
 
             @Override
             public void onReceiveAd(com.startapp.sdk.adsbase.Ad ad) {
-
                 Log.v(TAG, "Interstitial Loaded");
-
-                if (isInterstitialScheduledForShow){
-                    showFullScreen();
-                }
+                isInterstitialReady = true;
             }
 
             @Override
             public void onFailedToReceiveAd(com.startapp.sdk.adsbase.Ad ad) {
-
                 Log.v(TAG, "Interstitial Failed");
-
-                if (isInterstitialScheduledForShow){
-                    interstitialDidFail();
-                }
+                isInterstitialReady = false;
             }
         });
     }
@@ -170,25 +133,21 @@ public class PTStartAppBridge {
 
         Log.v(TAG, "showFullScreen");
 
-        isInterstitialScheduledForShow = true;
+        if (interstitial == null) return;
 
-        if (interstitial != null){
+        s_activity.get().runOnUiThread(() -> {
 
-            s_activity.get().runOnUiThread(() -> {
+            if (isInterstitialReady){
 
-                if (interstitial.isReady()){
+                interstitial.showAd();
+                isInterstitialReady = false;
 
-                    interstitial.showAd();
+                loadInterstitial(); // reload next ad
 
-                    isInterstitialScheduledForShow = false;
+            } else {
+                Log.v(TAG, "Interstitial not ready yet");
+            }
 
-                    loadInterstitial();
-
-                } else {
-
-                    isInterstitialScheduledForShow = true;
-                }
-            });
-        }
+        });
     }
 }
