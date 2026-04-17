@@ -196,4 +196,16 @@ public class PTPlayer extends Cocos2dxActivity {
 
         alertDlg.create().show();
     }
+
+    @Override
+    protected void onResume() {
+       super.onResume();
+       com.startapp.sdk.adsbase.StartAppSDK.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+       super.onPause();
+       com.startapp.sdk.adsbase.StartAppSDK.onPause(this);
+    }
 }
