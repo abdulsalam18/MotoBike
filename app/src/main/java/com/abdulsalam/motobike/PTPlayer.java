@@ -126,7 +126,8 @@ public class PTPlayer extends Cocos2dxActivity {
     protected void onResume() {
         super.onResume();
         MemoryManager.onResume();
-
+        com.startapp.sdk.adsbase.StartAppSDK.onResume(this);
+        
         if (PTJniHelper.isAdNetworkActive("kChartboost")) {
             PTAdChartboostBridge.onResume(this);
         }
@@ -175,12 +176,6 @@ public class PTPlayer extends Cocos2dxActivity {
         alertDlg.setNeutralButton("No", (dialog, which) -> {});
 
         alertDlg.create().show();
-    }
-
-    @Override
-    protected void onResume() {
-       super.onResume();
-       com.startapp.sdk.adsbase.StartAppSDK.onResume(this);
     }
 
     @Override
